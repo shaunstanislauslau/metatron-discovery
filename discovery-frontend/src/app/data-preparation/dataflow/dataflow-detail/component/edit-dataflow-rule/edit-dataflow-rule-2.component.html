@@ -71,12 +71,9 @@
                        [ruleList]="ruleList"
                        [redoable]="redoable"
                        [undoable]="undoable"
-                       (jumpEvent)="jump($event)"
-                       (redoUndoEvent)="transformAction($event)"
-                       (deleteEvent)="deleteRule($event)"
-                       (editEvent)="setEditData($event)"
-                       (addRuleEvent)="insertStep($event)"
-                       (snapshotDetailEvent)="getSnapshotDetail($event)" (snapshotListJump)="useUnloadConfirm = true;">
+                       (ruleEvent)="onRuleEvent($event)"
+                       (snapshotListJump)="useUnloadConfirm = true;"
+                       (snapshotDetailEvent)="getSnapshotDetail($event)">
         </app-rule-list>
         <!-- // Rule list -->
 

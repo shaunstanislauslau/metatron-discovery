@@ -580,6 +580,7 @@ export class DataflowDetail2Component extends AbstractPopupComponent {
           // 선택된 wrangled dataset의 imported dataset id를 몰라서 넘겨야한다 ;
           this.dfModelService.setUpstreamList(upstreams);
 
+          // 이거 할 필요가 있나 ?
           let upstreamList = upstreams.filter((upstream: Upstream) => {
             return upstream.dfId === this.dataflow.dfId;
           });

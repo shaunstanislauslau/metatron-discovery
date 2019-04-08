@@ -1041,6 +1041,33 @@ export class EditDataflowRule2Component extends AbstractPopupComponent implement
     }
   }
 
+
+  /**
+   * Output event
+   * @param data
+   */
+  public onRuleEvent(data: any) {
+
+    switch (data.id) {
+      case 'jump':
+        this.jump(data.data);
+        break;
+      case 'edit':
+        this.setEditData(data.data);
+        break;
+      case 'delete':
+        this.deleteRule(data.data);
+        break;
+      case 'insert':
+        this.insertStep(data.data);
+        break;
+      case 'redoUndo':
+        this.transformAction(data.data);
+        break;
+    }
+
+  }
+
   /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    | Public Method - for EditRuleGrid
    |-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
@@ -1535,11 +1562,10 @@ export class EditDataflowRule2Component extends AbstractPopupComponent implement
       this._editRuleGridComp.unSelectionAll();
 
       this.serverSyncIndex = data.apiData.ruleCurIdx;
-      //if (data.apiData.ruleStringInfos.length > 0) {
+
       if (data.apiData.transformRules.length > 0) {
         this._editRuleGridComp.setAffectedColumns(
           data.apiData.gridResponse['interestedColNames'],
-          //data.apiData.ruleStringInfos[data.apiData.ruleStringInfos.length - 1].command);
           data.apiData.transformRules[data.apiData.transformRules.length - 1].command);
       }
 
@@ -1549,7 +1575,7 @@ export class EditDataflowRule2Component extends AbstractPopupComponent implement
 
       if (command !== 'join' && command !== 'derive' && command !== 'aggregate' && command !== 'move') {
         // 저장된 위치로 이동
-        // this._editRuleGridComp.moveToSavedPosition();
+        this._editRuleGridComp.moveToSavedPosition();
       }
       // 계속 클릭하는거 방지
       if (isUndo && this.isUndoRunning) {

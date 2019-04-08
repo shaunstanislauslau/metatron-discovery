@@ -21,7 +21,6 @@ import {Rule} from '../../../../../domain/data-preparation/pr-dataset';
 import {DataSnapshotService} from "../../../../data-snapshot/service/data-snapshot.service";
 import {Alert} from "../../../../../common/util/alert.util";
 import {PreparationCommonUtil} from "../../../../util/preparation-common.util";
-import {Observable} from "rxjs";
 
 @Component({
   selector: 'app-rule-list',
@@ -46,19 +45,7 @@ export class RuleListComponent extends AbstractComponent implements OnInit, OnDe
   | Public Variables
   |-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
   @Output()
-  public jumpEvent = new EventEmitter();
-
-  @Output()
-  public redoUndoEvent = new EventEmitter();
-
-  @Output()
-  public addRuleEvent = new EventEmitter();
-
-  @Output()
-  public editEvent = new EventEmitter();
-
-  @Output()
-  public deleteEvent = new EventEmitter();
+  public ruleEvent = new EventEmitter();
 
   @Input()
   public ruleList: any[] = [];
@@ -208,7 +195,7 @@ export class RuleListComponent extends AbstractComponent implements OnInit, OnDe
    * @param {number} idx
    */
   public deleteRule(idx: number) {
-    this.deleteEvent.emit(idx);
+    this.ruleEvent.emit({id: 'delete', data: idx});
   }
 
 
@@ -218,7 +205,7 @@ export class RuleListComponent extends AbstractComponent implements OnInit, OnDe
    */
   public insertStep(rule : Rule) {
     this.selectedRuleIdx = undefined;
-    this.addRuleEvent.emit(rule['ruleNo']);
+    this.ruleEvent.emit({id: 'insert', data: rule['ruleNo']})
   }
 
 
@@ -228,7 +215,7 @@ export class RuleListComponent extends AbstractComponent implements OnInit, OnDe
    */
   public editRule(rule : Rule) {
     this.selectedRuleIdx = undefined;
-    this.editEvent.emit(rule);
+    this.ruleEvent.emit({id: 'edit', data: rule})
   }
 
 
@@ -237,7 +224,7 @@ export class RuleListComponent extends AbstractComponent implements OnInit, OnDe
    * @param {String} action
    */
   public transformAction(action : string) {
-    this.redoUndoEvent.emit(action);
+    this.ruleEvent.emit({id: 'redoUndo', data: action})
   }
 
 
@@ -250,7 +237,7 @@ export class RuleListComponent extends AbstractComponent implements OnInit, OnDe
       rule.isEditMode = false;
     });
     this.selectedRuleIdx = idx;
-    this.jumpEvent.emit(idx)
+    this.ruleEvent.emit({id: 'jump', data: idx})
   }
 
 
@@ -262,7 +249,7 @@ export class RuleListComponent extends AbstractComponent implements OnInit, OnDe
   public cancelEditMode( rule : Rule, idx : number ) {
     rule.isEditMode = false;
     this.selectedRuleIdx = idx;
-    this.jumpRule(idx);
+    this.ruleEvent.emit({id: 'jump', data: idx})
   }
 
 
@@ -274,7 +261,7 @@ export class RuleListComponent extends AbstractComponent implements OnInit, OnDe
   public cancelInsertMode( rule : Rule, idx : number ) {
     rule.isInsertStep = false;
     this.selectedRuleIdx = idx;
-    this.jumpRule(idx);
+    this.ruleEvent.emit({id: 'jump', data: idx})
   }
 
 

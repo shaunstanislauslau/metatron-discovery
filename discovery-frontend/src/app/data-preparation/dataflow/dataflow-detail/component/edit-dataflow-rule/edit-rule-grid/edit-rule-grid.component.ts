@@ -270,7 +270,6 @@ export class EditRuleGridComponent extends AbstractComponent implements OnInit, 
         obj.colname = item;
         obj.coltype = colTypes[i];
         colNameTypes.push(obj);
-        obj = { colname :null, coltype : null};
       });
       // Column Width 설정
       (this.columnWidths) || (this.columnWidths = {});
@@ -352,26 +351,18 @@ export class EditRuleGridComponent extends AbstractComponent implements OnInit, 
     if (!isNull(this._gridComp.getGridCore())) {
       switch (direction) {
         case 'COL' :
-          if (this._selectedColumns.length > 0) {
-            this._gridComp.columnAllUnSelection();
-            this._selectedColumns = [];
-          }
+          this._gridComp.columnAllUnSelection();
+          this._selectedColumns = [];
           break;
         case 'ROW' :
-          if (0 < this._selectedRows.length) {
-            this._gridComp.rowAllUnSelection();
-            this._selectedRows = [];
-          }
+          this._gridComp.rowAllUnSelection();
+          this._selectedRows = [];
           break;
         default :
-          if (0 < this._selectedRows.length) {
-            this._gridComp.rowAllUnSelection();
-            this._selectedRows = [];
-          }
-          if (this._selectedColumns.length > 0) {
-            this._gridComp.columnAllUnSelection();
-            this._selectedColumns = [];
-          }
+          this._gridComp.rowAllUnSelection();
+          this._selectedRows = [];
+          this._gridComp.columnAllUnSelection();
+          this._selectedColumns = [];
       }
     }
   } // function - unSelectionAll
@@ -434,7 +425,6 @@ export class EditRuleGridComponent extends AbstractComponent implements OnInit, 
 
 
     this._gridComp.getGridCore().scrollRowIntoView(0);
-    this._selectedRows = [];
     this._rowClickHandler(this._selectedRows);
 
     // 현재 선택되어있는 바 차트 refresh
@@ -490,14 +480,8 @@ export class EditRuleGridComponent extends AbstractComponent implements OnInit, 
           this._applyChart(this._barCharts[i], options)
         }
       }
-      this._gridComp.rowAllUnSelection();
-      this._selectedRows = [];
-
+      this.unSelectionAll('ROW');
     }
-
-    // let list = this._gridData.fields.map((item) => {
-    //   return this.escapedName(item.name);
-    // });
 
     // Only use data.id when data.id exists in this_gridData.fields
     const idx: number = this._gridData.fields.findIndex(orgItem => orgItem.uuid === data.id);
@@ -565,7 +549,7 @@ export class EditRuleGridComponent extends AbstractComponent implements OnInit, 
 
     // 컬럼이 선택되어 있다면 all unsel
     if (this._selectedColumns.length > 0) {
-      this._gridComp.columnAllUnSelection();
+      this.unSelectionAll('COL');
     }
 
     // 현재 선택되어있는 바 차트 refresh
@@ -595,7 +579,6 @@ export class EditRuleGridComponent extends AbstractComponent implements OnInit, 
         this._applyChart(this._charts[index], options)
       }
     });
-    this._selectedRows = [];
     // }
 
     if (event.event.shiftKey) {
@@ -812,10 +795,6 @@ export class EditRuleGridComponent extends AbstractComponent implements OnInit, 
     } catch (e) {
       console.error(e);
     }
-    // this._histogramMouseEvent(data.chart1, name, histogramInfo,data.index);
-    //
-    // this._barChartHoverEvent(data.chart2, name, histogramInfo, data.index);
-    // this._barChartClickEvent(data.chart2, histogramInfo, data.index);
   } // function - _drawChartsByColumn
 
   /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -829,17 +808,13 @@ export class EditRuleGridComponent extends AbstractComponent implements OnInit, 
   public onContextMenuItemClick(data) {
 
     if (data.more) {
-      this._gridComp.columnAllUnSelection();
+      this.unSelectionAll('COL');
 
       this._selectedColumns = data.more.col;
 
       this._selectedColumns.forEach((item) => {
         this._gridComp.selectColumn(item, true);
       });
-
-      if ('derive' === data.more.command) {
-        this._selectedRows = [];
-      }
 
     }
 
@@ -1006,7 +981,7 @@ export class EditRuleGridComponent extends AbstractComponent implements OnInit, 
       $(`#` + opts.uuid)[0].style.width = opts.columnWidth + 'px';
 
       if (this._barClickedSeries[opts.columnIndex].length === 0) {
-        this._selectedRows = [];
+
         // 폭이 조정됐을 떄 선택 되어있던 히스토그램이 이제 보이지 않는다면 unselect 과정..
         let clonedData = _.cloneDeep(this._clickedSeries[opts.columnIndex]);
         clonedData.forEach((item) => {
@@ -1117,8 +1092,7 @@ export class EditRuleGridComponent extends AbstractComponent implements OnInit, 
 
         // 현재 선택되어있는 column/row refresh
         if (this._selectedColumns.length > 0) {
-          this._gridComp.columnAllUnSelection();
-          this._selectedRows = [];
+          this.unSelectionAll('COL');
         }
 
         // 현재 선택되어있는 바 차트 refresh
@@ -1190,7 +1164,6 @@ export class EditRuleGridComponent extends AbstractComponent implements OnInit, 
           try{
             minusTarget = _.clone(this._getHistogramInfo(index).rownos[useParam.dataIndex]);
             tempRows = _.clone(this._selectedRows);
-            this._selectedRows = [];
           }catch (error){
             minusTarget = [];
             tempRows = [];
@@ -1266,7 +1239,6 @@ export class EditRuleGridComponent extends AbstractComponent implements OnInit, 
       if (isNull(params)) {
         // 현재 클릭된 시리즈 해제
         this._barClickedSeries[index] = [];
-        this._selectedRows = [];
         this.unSelectionAll('ROW');
 
       } else {
@@ -1281,7 +1253,6 @@ export class EditRuleGridComponent extends AbstractComponent implements OnInit, 
         if (chartIndex !== -1) {
           this._clickedSeries[chartIndex] = [];
           this.unSelectionAll('ROW');
-          this._selectedRows = [];
           options = this._getDefaultChartOption(this._getHistogramInfo(chartIndex), chartIndex);
           this._applyChart(this._charts[chartIndex], options)
         }
@@ -1294,7 +1265,6 @@ export class EditRuleGridComponent extends AbstractComponent implements OnInit, 
             if (this._barClickedSeries[i].length !== 0) {
               this._barClickedSeries[i] = [];
               this.unSelectionAll('ROW');
-              this._selectedRows = [];
               options = this._getDefaultBarChartOption(this._getHistogramInfo(i), i);
               this._applyChart(this._barCharts[i], options)
             }
@@ -1353,7 +1323,6 @@ export class EditRuleGridComponent extends AbstractComponent implements OnInit, 
           try{
             minusTarget = _.clone(this._getHistogramInfo(index)[params.seriesName + 'Rows']);
             tempChartRows = _.clone(this._selectedRows);
-            this._selectedRows = [];
           }catch (error){
             minusTarget = [];
             tempChartRows = [];
@@ -1664,6 +1633,7 @@ export class EditRuleGridComponent extends AbstractComponent implements OnInit, 
   public _rowClickHandler(selectedRows) {
     this._gridComp.rowSelection(selectedRows);
     this._gridComp.getGridCore().scrollRowIntoView(_.min(selectedRows));
+    this._selectedRows = selectedRows;
   } // function - _rowClickHandler
 
   /**
